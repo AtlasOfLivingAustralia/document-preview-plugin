@@ -31,7 +31,7 @@ class PreviewController {
         ahc.setParams(params)
 
         def location = http.request(GET, TEXT) {
-            uri.path = 'api/pdf';
+            uri.path = '/api/pdf';
             uri.query = ['docUrl': url]
 
             response.success = { rsp ->
