@@ -10,10 +10,8 @@
 </body>
 
     <r:script disposition="head">
-    console.log ('This  listDocuments.gsp Script');
     var options;
     $(window).load(function () {
-        console.log ('Loading listDocuments config ');
 
         var documents = JSON.parse('${documents.toString()}');
 
@@ -33,16 +31,7 @@
     }
 
         var docListViewModel = new DocListViewModel(documents || [], options);
-
-        console.log('-- Applying bindings');
-        try{
-            ko.applyBindings(docListViewModel, document.getElementById('resourceList'));
-        } catch (e)
-        {
-            log.warn(e);
-            log.warn("Is this double initialisation or something else");
-        }
-        console.log('-- Finished applying bindings');
+        ko.applyBindings(docListViewModel, document.getElementById('resourceList'));
 });
 
 </r:script>
