@@ -1,7 +1,7 @@
 <%@ page import="grails.converters.JSON" %>
 <r:require modules="resourceKnockout,attachDocuments"/>
 <div class="row-fluid row-eq-height" id="resourceList">
-        <div class="span4">
+        <div class="col-sm-4">
                 <div class="form-inline text-right">
                         <div class="input-group text-left">
                                 <span class="input-group-addon btn-default"><i class="fa fa-filter"></i></span>
@@ -31,7 +31,7 @@
                 <p/>
                 <g:if test="${documentResourceAdmin}"><button class="btn btn-default" data-bind="click:attachDocument">New Resource</button></g:if>
         </div>
-        <div class="span8">
+        <div class="col-sm-8">
                 <div class="fc-resource-preview-container" data-bind="{ template: { name: previewTemplate } }">
                 </div>
         </div>

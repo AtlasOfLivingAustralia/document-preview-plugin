@@ -30,6 +30,7 @@ modules = {
         dependsOn 'bootstrap3'
         dependsOn 'resourceJqueryFileUpload'
         dependsOn 'resourceKnockout'
+        resource url: 'css/document-preview.css', disposition: 'head'
         resource url: 'js/preview/document.js'
     }
 
