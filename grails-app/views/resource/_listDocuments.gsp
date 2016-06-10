@@ -1,14 +1,12 @@
 <%@ page import="grails.converters.JSON" %>
 <r:require modules="resourceKnockout,attachDocuments"/>
 <div class="row-fluid row-eq-height" id="resourceList">
-
         <div class="span4">
-
-                <div class="btn-toolbar text-right">
-                        <div class="input-prepend input-append text-left">
-                                <span class="add-on"><i class="fa fa-filter"></i></span>
-                                <input type="text" data-bind="textInput: documentFilter">
-                                <div class="btn-group">
+                <div class="form-inline text-right">
+                        <div class="input-group text-left">
+                                <span class="input-group-addon btn-default"><i class="fa fa-filter"></i></span>
+                                <input type="text" class="form-control delegated-search-control"  data-bind="textInput: documentFilter">
+                                <div class="input-group-btn">
                                         <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
                                                 <span data-bind="text: documentFilterField().label"></span>
                                                 <span class="caret"></span>
