@@ -62,7 +62,8 @@
 </script>
 
 <script id="xssViewer" type="text/html">
-<div class="embed-responsive embed-responsive-16by9 col-xs-12 text-center" data-bind="html: selectedDocument().embeddedVideo"></div>
+<div class="embed-responsive embed-responsive-16by9 col-xs-12 text-center"  data-bind="visible: selectedDocument().embeddedVideoVisible html: selectedDocument().embeddedVideo"></div>
+<div class="embed-responsive embed-responsive-16by9 col-xs-12 text-center"  data-bind="visible: selectedDocument().embeddedAudioVisible html: selectedDocument().embeddedAudio"></div>
 </script>
 
 <script id="noPreviewViewer" type="text/html">

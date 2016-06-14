@@ -137,6 +137,12 @@ function DocumentViewModel (doc, owner, settings) {
         return (self.role() == 'embeddedVideo');
     });
 
+    this.embeddedAudio = ko.observable(doc.embeddedAudio);
+    this.embeddedAudioVisible = ko.computed(function() {
+        return (self.role() == 'embeddedAudio');
+    });
+
+
     this.thirdPartyConsentDeclarationMade.subscribe(function(declarationMade) {
         // Record the text that the user agreed to (as it is an editable setting).
         if (declarationMade) {
@@ -148,7 +154,8 @@ function DocumentViewModel (doc, owner, settings) {
         $("#thirdPartyConsentCheckbox").closest('form').validationEngine("updatePromptsPosition")
     });
     this.thirdPartyConsentDeclarationRequired = ko.computed(function() {
-        return (self.type() == 'image' ||  self.role() == 'embeddedVideo')  && self.public();
+        return (self.type() == 'image' ||  self.role() == 'embeddedVideo' ||  self.role() == 'embeddedAudio' )
+            && self.public();
     });
     this.thirdPartyConsentDeclarationRequired.subscribe(function(newValue) {
         if (newValue) {
@@ -164,12 +171,19 @@ function DocumentViewModel (doc, owner, settings) {
         }
         else if(self.role() == 'embeddedVideo'){
             return buildiFrame(self.embeddedVideo()) != "" ;
+        } else if(self.role() == 'embeddedAudio'){
+            return buildiFrame(self.embeddedAudio()) != "" ;
         }
 
         return self.fileReady();
     });
     this.saveHelp = ko.computed(function() {
-        if(self.role() == 'embeddedVideo' && !buildiFrame(self.embeddedVideo())){
+        if(self.role() == 'embeddedAudio' && !buildiFrame(self.embeddedAudio())){
+            return 'Invalid embed audio code';
+        }
+        else if(self.role() == 'embeddedAudio' && !self.saveEnabled()){
+            return 'You must accept the Privacy Declaration before an embed audio can be made viewable by everyone';
+        }if(self.role() == 'embeddedVideo' && !buildiFrame(self.embeddedVideo())){
             return 'Invalid embed video code';
         }
         else if(self.role() == 'embeddedVideo' && !self.saveEnabled()){
@@ -280,7 +294,7 @@ function DocumentViewModel (doc, owner, settings) {
     };
 
     this.modelForSaving = function() {
-        return ko.mapping.toJS(self, {'ignore':['embeddedVideoVisible', 'iframe','helper', 'progress', 'hasPreview', 'error', 'fileLabel', 'file', 'complete', 'fileButtonText', 'roles', 'settings', 'thirdPartyConsentDeclarationRequired', 'saveEnabled', 'saveHelp', 'fileReady']});
+        return ko.mapping.toJS(self, {'ignore':['embeddedVideoVisible','embeddedAudioVisible', 'iframe','helper', 'progress', 'hasPreview', 'error', 'fileLabel', 'file', 'complete', 'fileButtonText', 'roles', 'settings', 'thirdPartyConsentDeclarationRequired', 'saveEnabled', 'saveHelp', 'fileReady']});
     };
 
 }
@@ -560,7 +574,8 @@ function Documents(options) {
         if (selectedDoc) {
             var contentType = (selectedDoc.contentType() || 'application/octet-stream').toLowerCase().trim();
             var embeddedVideo = selectedDoc.embeddedVideo();
-            if (embeddedVideo) {
+            var embeddedAudio = selectedDoc.embeddedAudio();
+            if (embeddedVideo || embeddedAudio) {
                 val = "xssViewer";
             } else if (listContains(contentTypes.convert.concat(contentTypes.audio, contentTypes.video, contentTypes.image, contentTypes.pdf), contentType)) {
                 val = "iframeViewer";
@@ -794,6 +809,21 @@ function Documents(options) {
         return ev.length > 0 ? ev : null;
     });
 
+    self.embeddedAudios = ko.computed(function () {
+        var ev = $.grep(self.documents(), function (doc) {
+            var isPublic = ko.utils.unwrapObservable(doc.public);
+            var embeddedAudio = ko.utils.unwrapObservable(doc.embeddedAudio);
+            if(isPublic && embeddedAudio) {
+                var iframe = buildiFrame(embeddedAudio);
+                if(iframe){
+                    doc.iframe = iframe;
+                    return doc;
+                }
+            }
+        });
+        return ev.length > 0 ? ev : null;
+    });
+
     self.deleteDocumentByRole = function(role) {
         var doc = self.findDocumentByRole(self.documents(), role);
         if (doc) {
@@ -807,7 +837,7 @@ function Documents(options) {
         }
     };
 
-    self.ignore = ['documents', 'links', 'logoUrl', 'bannerUrl', 'mainImageUrl', 'primaryImages', 'embeddedVideos',
+    self.ignore = ['documents', 'links', 'logoUrl', 'bannerUrl', 'mainImageUrl', 'primaryImages', 'embeddedVideos', 'embeddedAudios',
         'ignore', 'transients', 'documentFilter', 'documentFilterFieldOptions', 'documentFilterField',
         'previewTemplate', 'selectedDocumentFrameUrl', 'filteredDocuments','docViewerClass','docListClass',
         'mainImageAttributionText', 'logoAttributionText'];
@@ -837,8 +867,8 @@ function formatBytes(bytes) {
     return (bytes / 1000).toFixed(2) + ' KB';
 }
 
-function buildiFrame(embeddedVideo){
-    var html = $.parseHTML(embeddedVideo);
+function buildiFrame(embeddedAudioOrVideo){
+    var html = $.parseHTML(embeddedAudioOrVideo);
     var iframe = "";
     if(html){
         for(var i = 0; i < html.length; i++){
@@ -869,22 +899,3 @@ function getHostName(href) {
     l.href = href;
     return l.hostname;
 };
-
-// $(window).load(function () {
-//     console.log('Before parsing');
-//     //var documents = JSON.parse('${documents.toString()}');
-//     //var documents = JSON.parse('\u005b\u007b\u0022filepath\u0022:\u00222016-04\u0022\u002c\u0022status\u0022:\u0022active\u0022\u002c\u0022labels\u0022:\u005b\u005d\u002c\u0022lastUpdated\u0022:\u00222016-04-14T04:41:36Z\u0022\u002c\u0022contentType\u0022:\u0022image\u002fpng\u0022\u002c\u0022type\u0022:\u0022image\u0022\u002c\u0022isPrimaryProjectImage\u0022:false\u002c\u0022url\u0022:\u0022https:\u002f\u002fecodata-test.ala.org.au\u002fuploads\u002f2016-04\u002fScreen%20Shot%202016-02-04%20at%2010.34.23%20PM.png\u0022\u002c\u0022thirdPartyConsentDeclarationMade\u0022:false\u002c\u0022id\u0022:\u0022570f1f80e4b0475d032c5bc2\u0022\u002c\u0022thirdPartyConsentDeclarationText\u0022:\u0022null\u0022\u002c\u0022filesize\u0022:83033\u002c\u0022readOnly\u0022:false\u002c\u0022thumbnailUrl\u0022:\u0022https:\u002f\u002fecodata-test.ala.org.au\u002fuploads\u002f2016-04\u002fthumb_Screen%20Shot%202016-02-04%20at%2010.34.23%20PM.png\u0022\u002c\u0022name\u0022:\u0022Test\u0022\u002c\u0022dateCreated\u0022:\u00222016-04-14T04:41:36Z\u0022\u002c\u0022filename\u0022:\u0022Screen Shot 2016-02-04 at 10.34.23 PM.png\u0022\u002c\u0022role\u0022:\u0022mdba\u0022\u002c\u0022systemId\u0022:\u0022mdba\u0022\u002c\u0022documentId\u0022:\u00225a9f0657-1fd8-410e-8726-de482d080d60\u0022\u002c\u0022isSciStarter\u0022:false\u007d\u002c\u007b\u0022filepath\u0022:\u00222016-04\u0022\u002c\u0022status\u0022:\u0022active\u0022\u002c\u0022labels\u0022:\u005b\u005d\u002c\u0022lastUpdated\u0022:\u00222016-04-14T05:34:03Z\u0022\u002c\u0022contentType\u0022:\u0022application\u002fmsword\u0022\u002c\u0022type\u0022:\u0022application\u0022\u002c\u0022isPrimaryProjectImage\u0022:false\u002c\u0022url\u0022:\u0022https:\u002f\u002fecodata-test.ala.org.au\u002fuploads\u002f2016-04\u002f0_Testing%20with%20a%20space.doc\u0022\u002c\u0022thirdPartyConsentDeclarationMade\u0022:false\u002c\u0022id\u0022:\u0022570f2bcbe4b0475d032c5bd4\u0022\u002c\u0022thirdPartyConsentDeclarationText\u0022:\u0022null\u0022\u002c\u0022filesize\u0022:21842\u002c\u0022readOnly\u0022:false\u002c\u0022name\u0022:\u0022Testing with a space\u0022\u002c\u0022dateCreated\u0022:\u00222016-04-14T05:34:03Z\u0022\u002c\u0022filename\u0022:\u00220_Testing with a space.doc\u0022\u002c\u0022role\u0022:\u0022mdba\u0022\u002c\u0022systemId\u0022:\u0022mdba\u0022\u002c\u0022documentId\u0022:\u00222a8e40ac-b523-4ce1-96a0-886eb89f8449\u0022\u002c\u0022isSciStarter\u0022:false\u007d\u002c\u007b\u0022filepath\u0022:\u00222016-04\u0022\u002c\u0022status\u0022:\u0022active\u0022\u002c\u0022labels\u0022:\u005b\u005d\u002c\u0022lastUpdated\u0022:\u00222016-04-14T07:16:09Z\u0022\u002c\u0022contentType\u0022:\u0022image\u002fjpeg\u0022\u002c\u0022type\u0022:\u0022image\u0022\u002c\u0022isPrimaryProjectImage\u0022:false\u002c\u0022url\u0022:\u0022https:\u002f\u002fecodata-test.ala.org.au\u002fuploads\u002f2016-04\u002fMDBA_AG_crest_RGB_inline_small.jpg\u0022\u002c\u0022thirdPartyConsentDeclarationMade\u0022:false\u002c\u0022id\u0022:\u0022570f43b8e4b0475d032c5bdc\u0022\u002c\u0022thirdPartyConsentDeclarationText\u0022:\u0022null\u0022\u002c\u0022filesize\u0022:37490\u002c\u0022readOnly\u0022:false\u002c\u0022thumbnailUrl\u0022:\u0022https:\u002f\u002fecodata-test.ala.org.au\u002fuploads\u002f2016-04\u002fthumb_MDBA_AG_crest_RGB_inline_small.jpg\u0022\u002c\u0022name\u0022:\u0022Test doc 2\u0022\u002c\u0022dateCreated\u0022:\u00222016-04-14T07:16:09Z\u0022\u002c\u0022filename\u0022:\u0022MDBA_AG_crest_RGB_inline_small.jpg\u0022\u002c\u0022role\u0022:\u0022mdba\u0022\u002c\u0022systemId\u0022:\u0022mdba\u0022\u002c\u0022documentId\u0022:\u002291e513a6-e8e3-4cde-b3d0-8e3ee0312d7c\u0022\u002c\u0022isSciStarter\u0022:false\u007d\u002c\u007b\u0022status\u0022:\u0022active\u0022\u002c\u0022labels\u0022:\u005b\u005d\u002c\u0022embeddedVideo\u0022:\u0022\u003ciframe width=\u005c\u0022560\u005c\u0022 height=\u005c\u0022315\u005c\u0022 src=\u005c\u0022https:\u002f\u002fwww.youtube.com\u002fembed\u002fSi4f4waKW-M\u005c\u0022 frameborder=\u005c\u00220\u005c\u0022 allowfullscreen\u003e\u003c\u005cu002fiframe\u003e\u0022\u002c\u0022lastUpdated\u0022:\u00222016-04-22T02:36:58Z\u0022\u002c\u0022isPrimaryProjectImage\u0022:false\u002c\u0022url\u0022:\u0022\u0022\u002c\u0022thirdPartyConsentDeclarationMade\u0022:false\u002c\u0022id\u0022:\u002257198e4ae4b0c7a05c99cc4a\u0022\u002c\u0022thirdPartyConsentDeclarationText\u0022:\u0022\u007b\u007d\u0022\u002c\u0022readOnly\u0022:false\u002c\u0022name\u0022:\u0022Basin Champions video 1\u0022\u002c\u0022dateCreated\u0022:\u00222016-04-22T02:36:58Z\u0022\u002c\u0022role\u0022:\u0022mdba\u0022\u002c\u0022systemId\u0022:\u0022mdba\u0022\u002c\u0022documentId\u0022:\u0022f2fc30aa-7cb6-45a0-ad73-cc6eff4750b8\u0022\u002c\u0022isSciStarter\u0022:false\u007d\u005d');
-//
-//     var docListViewModel = new DocListViewModel(options.documents || [], options);
-//
-//     console.log('-- Applying bindings');
-//     try{
-//         ko.applyBindings(docListViewModel, document.getElementById('resourceList'));
-//     } catch (e)
-//     {
-//         log.warn(e);
-//         log.warn("Is this double initialisation or something else");
-//     }
-//
-//     console.log('-- Finished applying bindings');
-// });

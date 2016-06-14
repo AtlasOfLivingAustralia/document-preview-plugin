@@ -47,8 +47,19 @@
                             Embed video
                         </label>
                         <div class="controls">
-                            <textarea placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed host: Youtube, Vimeo, Ted, Wistia.)"
-                                      data-bind="value: embeddedVideo,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" id="embeddedVideo" type="text">
+                            <textarea id="embeddedVideo" placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed host: Youtube, Vimeo, Ted, Wistia.)"
+                                      data-bind="value: embeddedVideo,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
+                            </textarea>
+                        </div>
+                    </div>
+
+                    <div data-bind="visible: embeddedAudioVisible()">
+                        <label class="control-label" for="embeddedAudio">
+                            Embed audio
+                        </label>
+                        <div class="controls">
+                            <textarea id="embeddedAudio" placeholder="Example: <iframe width='560' height='315' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/260017391' frameborder='0' allowfullscreen></iframe> (Allowed host: Youtube, Vimeo, Ted, Wistia.)"
+                                      data-bind="value: embeddedAudio,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
                             </textarea>
                         </div>
                     </div>
@@ -75,7 +86,7 @@
                     </div>
 
 
-                    <div data-bind="visible: !embeddedVideoVisible()">
+                    <div data-bind="visible: !embeddedVideoVisible() && !embeddedAudioVisible()">
                         <div class="control-group">
                             <label class="control-label" for="documentFile">File</label>
 
