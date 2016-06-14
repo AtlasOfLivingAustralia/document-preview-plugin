@@ -107,9 +107,6 @@ function DocumentViewModel (doc, owner, settings) {
     this.name = ko.observable(doc.name);
     // the notes field can be used as a pseudo-document (eg a deferral reason) or just for additional metadata
     this.notes = ko.observable(doc.notes);
-    this.filetypeImg = function () {
-        return self.settings.imageLocation + '/filetypes/' + iconnameFromFilename(self.filename());
-    };
     this.status = ko.observable(doc.status || 'active');
     this.attribution = ko.observable(doc ? doc.attribution : '');
     this.license = ko.observable(doc ? doc.license : '');
@@ -142,6 +139,10 @@ function DocumentViewModel (doc, owner, settings) {
         return (self.role() == 'embeddedAudio');
     });
 
+    this.filetypeImg = function () {
+        return self.settings.imageLocation + '/filetypes/' +
+            getIconName(self.filename(), self.embeddedVideoVisible(), self.embeddedAudioVisible());
+    };
 
     this.thirdPartyConsentDeclarationMade.subscribe(function(declarationMade) {
         // Record the text that the user agreed to (as it is an editable setting).
@@ -170,20 +171,20 @@ function DocumentViewModel (doc, owner, settings) {
             return false;
         }
         else if(self.role() == 'embeddedVideo'){
-            return buildiFrame(self.embeddedVideo()) != "" ;
+            return buildiFrame(self.embeddedVideo(), true) != "" ;
         } else if(self.role() == 'embeddedAudio'){
-            return buildiFrame(self.embeddedAudio()) != "" ;
+            return buildiFrame(self.embeddedAudio(), false) != "" ;
         }
 
         return self.fileReady();
     });
     this.saveHelp = ko.computed(function() {
-        if(self.role() == 'embeddedAudio' && !buildiFrame(self.embeddedAudio())){
+        if(self.role() == 'embeddedAudio' && !buildiFrame(self.embeddedAudio(), false)){
             return 'Invalid embed audio code';
         }
         else if(self.role() == 'embeddedAudio' && !self.saveEnabled()){
             return 'You must accept the Privacy Declaration before an embed audio can be made viewable by everyone';
-        }if(self.role() == 'embeddedVideo' && !buildiFrame(self.embeddedVideo())){
+        }if(self.role() == 'embeddedVideo' && !buildiFrame(self.embeddedVideo(), true)){
             return 'Invalid embed video code';
         }
         else if(self.role() == 'embeddedVideo' && !self.saveEnabled()){
@@ -478,18 +479,6 @@ function findDocumentById(documents, id) {
     return null;
 }
 
-var DocModel = function (doc) {
-    var self = this;
-    this.name = doc.name;
-    this.attribution = doc.attribution;
-    this.filename = doc.filename;
-    this.type = doc.type;
-    this.url = doc.url;
-    this.thumbnailUrl = doc.thumbnailUrl ? doc.thumbnailUrl : doc.url;
-    this.filetypeImg = function () {
-        return imageLocation + "/filetypes/" + iconnameFromFilename(self.filename);
-    };
-};
 function DocListViewModel(documents, options) {
     var self = this;
     Documents.apply(self, [options]);
@@ -497,7 +486,7 @@ function DocListViewModel(documents, options) {
     var settings = {
         imageLocation:options.imageLocation,
         showSettings:false,
-        };
+    };
 
     if( options['roles']) {
         settings.roles = options.roles;
@@ -513,8 +502,8 @@ function DocListViewModel(documents, options) {
     self.attachDocument = function() {
         showDocumentAttachInModal(options.documentUpdateUrl, new DocumentViewModel({role:'information'},{key:'parentId', value:options.parentId}, settings), '#attachDocument')
             .done(function(result){
-                var newEntry = new DocumentViewModel(result, '',  settings);
-                self.documents.push(newEntry);
+                    var newEntry = new DocumentViewModel(result, '',  settings);
+                    self.documents.push(newEntry);
                 }
             );
     };
@@ -532,7 +521,11 @@ function DocListViewModel(documents, options) {
 }
 
 
-function iconnameFromFilename(filename) {
+function getIconName(filename, isVideo, isAudio) {
+    if(isVideo) {return 'video.png'}
+
+    if(isAudio) {return 'audio.png'}
+
     if (filename === undefined) { return "_blank.png"; }
     var ext = filename.split('.').pop(),
         types = ['aac','ai','aiff','avi','bmp','c','cpp','css','dat','dmg','doc','dotx','dwg','dxf',
@@ -799,7 +792,7 @@ function Documents(options) {
             var isPublic = ko.utils.unwrapObservable(doc.public);
             var embeddedVideo = ko.utils.unwrapObservable(doc.embeddedVideo);
             if(isPublic && embeddedVideo) {
-                var iframe = buildiFrame(embeddedVideo);
+                var iframe = buildiFrame(embeddedVideo, true);
                 if(iframe){
                     doc.iframe = iframe;
                     return doc;
@@ -814,7 +807,7 @@ function Documents(options) {
             var isPublic = ko.utils.unwrapObservable(doc.public);
             var embeddedAudio = ko.utils.unwrapObservable(doc.embeddedAudio);
             if(isPublic && embeddedAudio) {
-                var iframe = buildiFrame(embeddedAudio);
+                var iframe = buildiFrame(embeddedAudio, false);
                 if(iframe){
                     doc.iframe = iframe;
                     return doc;
@@ -867,16 +860,23 @@ function formatBytes(bytes) {
     return (bytes / 1000).toFixed(2) + ' KB';
 }
 
-function buildiFrame(embeddedAudioOrVideo){
+/*
+ isVideo is used to limit the allowed hosts for embedding videos
+ If isVideo is false the list of hosts will be limited to audio hosts.
+ */
+function buildiFrame(embeddedAudioOrVideo, isVideo){
     var html = $.parseHTML(embeddedAudioOrVideo);
     var iframe = "";
+    var allowedHosts = isVideo ?
+        ['fast.wistia.com','embed-ssl.ted.com', 'www.youtube.com', 'player.vimeo.com'] :
+        ['w.soundcloud.com'];
     if(html){
         for(var i = 0; i < html.length; i++){
             var element = html[i];
             var attr = $(element).attr('src');
             if(typeof attr !== typeof undefined && attr !== false){
                 var height =  element.getAttribute("height") ?  element.getAttribute("height") : "315";
-                iframe = isUrlAndHostValid(attr)  ? '<iframe width="100%" src ="' +  attr + '" height = "' + height + '"/></iframe>' : "";
+                iframe = isUrlAndHostValid(attr, allowedHosts)  ? '<iframe width="100%" src ="' +  attr + '" height = "' + height + '"/></iframe>' : "";
             }
             return iframe;
         }
@@ -885,8 +885,7 @@ function buildiFrame(embeddedAudioOrVideo){
     return iframe;
 }
 
-function isUrlAndHostValid(url) {
-    var allowedHost = ['fast.wistia.com','embed-ssl.ted.com', 'www.youtube.com', 'player.vimeo.com'];
+function isUrlAndHostValid(url, allowedHost) {
     return (url && isUrlValid(url) && $.inArray(getHostName(url), allowedHost) > -1)
 };
 

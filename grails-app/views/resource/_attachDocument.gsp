@@ -47,7 +47,7 @@
                             Embed video
                         </label>
                         <div class="controls">
-                            <textarea id="embeddedVideo" placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed host: Youtube, Vimeo, Ted, Wistia.)"
+                            <textarea id="embeddedVideo" placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed services: Youtube, Vimeo, Ted, Wistia.)"
                                       data-bind="value: embeddedVideo,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
                             </textarea>
                         </div>
@@ -58,7 +58,7 @@
                             Embed audio
                         </label>
                         <div class="controls">
-                            <textarea id="embeddedAudio" placeholder="Example: <iframe width='560' height='315' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/260017391' frameborder='0' allowfullscreen></iframe> (Allowed host: Youtube, Vimeo, Ted, Wistia.)"
+                            <textarea id="embeddedAudio" placeholder="Example: <iframe width='560' height='315' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/260017391' frameborder='0' allowfullscreen></iframe> (Allowed services: SoundCloud.)"
                                       data-bind="value: embeddedAudio,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
                             </textarea>
                         </div>
