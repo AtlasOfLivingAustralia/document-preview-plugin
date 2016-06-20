@@ -134,10 +134,14 @@ function DocumentViewModel (doc, owner, settings) {
         return (self.role() == 'embeddedVideo');
     });
 
+
     this.embeddedAudio = ko.observable(doc.embeddedAudio);
     this.embeddedAudioVisible = ko.computed(function() {
         return (self.role() == 'embeddedAudio');
     });
+
+
+    this.primaryAudio = ko.observable(doc.primaryAudio);
 
     this.filetypeImg = function () {
         return self.settings.imageLocation + '/filetypes/' +
