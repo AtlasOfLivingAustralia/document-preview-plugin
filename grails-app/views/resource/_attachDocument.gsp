@@ -35,10 +35,10 @@
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="documentLicense">License</label>
+                        <label class="control-label" for="documentLicence">Licence</label>
 
                         <div class="controls">
-                            <input id="documentLicense" type="text" data-bind="value:license"/>
+                            <input id="documentLicence" type="text" data-bind="value:licence"/>
                         </div>
                     </div>
 
@@ -54,12 +54,6 @@
                     </div>
 
                     <div data-bind="visible: embeddedAudioVisible()">
-                        <label class="control-label" for="primaryAudio">
-                            Primary audio
-                        </label>
-                        <div class="controls">
-                            <g:checkBox name="primaryAudio" data-bind="value: primaryAudio"></g:checkBox>
-                        </div>
                         <label class="control-label" for="embeddedAudio">
                             Embed audio
                         </label>

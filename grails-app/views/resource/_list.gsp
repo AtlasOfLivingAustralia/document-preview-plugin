@@ -30,8 +30,8 @@
             admin: ${documentResourceAdmin || false}
     }
 
-        var docListViewModel = new DocListViewModel(documents || [], options);
-        ko.applyBindings(docListViewModel, document.getElementById('resourceList'));
+    ALA.DocView.initDocView('resourceList', options);
+
 });
 
 </r:script>
