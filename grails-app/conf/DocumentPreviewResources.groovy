@@ -29,6 +29,7 @@ modules = {
         dependsOn 'jquery'
         dependsOn 'bootstrap3'
         dependsOn 'resourceJqueryFileUpload'
+        dependsOn 'jqueryValidationEngine'
         dependsOn 'resourceKnockout'
         resource url: 'css/document-preview.css', disposition: 'head'
         resource url: 'js/preview/document.js'
@@ -43,5 +44,10 @@ modules = {
     resourceJqueryUI {
         resource url: 'vendor/jquery-ui/jquery-ui-1.11.2-no-autocomplete.js', disposition: 'head'
         resource url: '/vendor/jquery-ui/themes/smoothness/jquery-ui.css', attrs: [media: 'all'], disposition: 'head'
+    }
+    jqueryValidationEngine {
+        resource url: 'vendor/jquery.validationEngine/jquery.validationEngine.js'
+        resource url: 'vendor/jquery.validationEngine/jquery.validationEngine-en.js'
+        resource url: 'vendor/jquery.validationEngine/validationEngine.jquery.css'
     }
 }

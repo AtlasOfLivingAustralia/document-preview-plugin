@@ -1,7 +1,7 @@
 /**
  * @namespace
  */
-var ALA = {};
+var ALA = ALA || {};
 
 /**
  * A view model to capture metadata about a document and manage progress / feedback as a file is uploaded.
@@ -324,21 +324,68 @@ ALA.DocListViewModel = function (documents, options) {
         var url = options.documentUpdateUrl + "/" + document.documentId;
         self.showDocumentAttachInModal(url, document, '#attachDocument')
             .done(function (result) {
-                //window.location.reload(); // The display doesn't update properly otherwise.
             });
     };
     self.deleteDocument = function (document) {
         var url = options.documentDeleteUrl + '/' + document.documentId;
-        // $.post(url, {}, function() {self.documents.remove(document);});
-
-        $.ajax({
-            url: url,
-            type: 'DELETE',
-            success: function () {
-                self.documents.remove(document);
-            }
+        self.showRemoveDocumentModal(url, document, '#removeDocument').
+        done(function (result) {
+            self.documents.remove(result);
+            self.selectedDocument(null);
         });
     };
+
+
+    self.showRemoveDocumentModal = function (deleteUrl, documentViewModel, modalSelector, fileUploadSelector, previewSelector) {
+        var node = document.getElementById("removeDocument");
+        var $modal = $(modalSelector);
+
+        // Used to communicate the result back to the calling process.
+        var result = $.Deferred();
+
+        // Decorate the model so it can handle the button presses and close the modal window.
+        documentViewModel.cancelRemove = function () {
+            console.log('Cancel removal');
+            result.reject();
+            closeModal();
+        };
+
+        documentViewModel.doRemove = function () {
+            console.log('This is going to remove document ');
+            console.log(documentViewModel);
+
+            $.ajax({
+                url: deleteUrl,
+                type: 'DELETE',
+                success: function () {
+                    console.log("Service call succeeded");
+                    result.resolve(documentViewModel);
+                },
+                fail: function () {
+                    result.reject();
+                }
+            });
+            closeModal();
+        };
+
+        // Close the modal and tidy up the bindings.
+        var closeModal = function () {
+            $modal.modal('hide');
+            $modal.removeClass("in");
+            $(".modal-backdrop").remove();
+            $('body').removeClass('modal-open');
+            $modal.hide();
+            ko.cleanNode(node);
+        };
+
+        ko.applyBindings(documentViewModel, node);
+
+        // Do the binding from the model to the view?  Or assume done already?
+        $modal.modal({backdrop: 'static'});
+
+        return result;
+    };
+
 
     /**
      * Attaches the jquery.fileupload plugin to the element identified by the uiSelector parameter and
@@ -409,22 +456,24 @@ ALA.DocListViewModel = function (documents, options) {
         // We are keeping the reference to the helper here rather than the view model as it doesn't serialize correctly
         // (i.e. calls to toJSON fail).
         documentViewModel.save = function () {
-            if (documentViewModel.filename() && fileUploadHelper !== undefined) {
-                fileUploadHelper.submit();
-                fileUploadHelper = null;
-            }
-            else {
-                // There is no file attachment but we can save the document anyway.
-                $.post(
-                    uploadUrl,
-                    {document: documentViewModel.toJSONString()},
-                    function (result) {
-                        var resp = JSON.parse(result).resp;
-                        documentViewModel.fileUploaded(resp);
-                    })
-                    .fail(function () {
-                        documentViewModel.fileUploadFailed('Error uploading document');
-                    });
+            if ($("#documentForm").validationEngine('validate', {promptPosition : "centerRight", scroll: false} )) {
+                if (documentViewModel.filename() && fileUploadHelper !== undefined) {
+                    fileUploadHelper.submit();
+                    fileUploadHelper = null;
+                }
+                else {
+                    // There is no file attachment but we can save the document anyway.
+                    $.post(
+                        uploadUrl,
+                        {document: documentViewModel.toJSONString()},
+                        function (result) {
+                            var resp = JSON.parse(result).resp;
+                            documentViewModel.fileUploaded(resp);
+                        })
+                        .fail(function () {
+                            documentViewModel.fileUploadFailed('Error uploading document');
+                        });
+                }
             }
         }
     };
@@ -440,7 +489,7 @@ ALA.DocListViewModel = function (documents, options) {
      * @returns an instance of jQuery.Deferred - the uploaded document will be supplied to a chained 'done' function.
      */
     self.showDocumentAttachInModal = function (uploadUrl, documentViewModel, modalSelector, fileUploadSelector, previewSelector) {
-
+        $("#documentForm").validationEngine('hide');
         if (fileUploadSelector === undefined) {
             fileUploadSelector = '#attachDocument';
         }
@@ -461,8 +510,8 @@ ALA.DocListViewModel = function (documents, options) {
             closeModal();
         };
         documentViewModel.close = function () {
-            result.resolve(ko.toJS(documentViewModel));
-            closeModal();
+                result.resolve(ko.toJS(documentViewModel));
+                closeModal();
         };
 
         // Close the modal and tidy up the bindings.
@@ -486,7 +535,7 @@ ALA.DocListViewModel = function (documents, options) {
                     '#thirdPartyConsentCheckbox': {
                         'required': {'message': 'The privacy declaration is required for images viewable by everyone'}
                     }
-                }, 'autoPositionUpdate': true, promptPosition: 'inline'
+                }, 'autoPositionUpdate': false, promptPosition: 'inline'
             });
         });
 
@@ -594,7 +643,7 @@ ALA.DocView = {
             return list.indexOf(value) > -1;
         }
 
-        self.selectDocument = function (data) {
+        self.selectDocument  = function (data) {
             self.selectedDocument(data);
             return true;
         };
@@ -876,11 +925,6 @@ ALA.DocView = {
 
     },
 
-    initDocView: function (rootElementId, options) {
-        var docListViewModel = new ALA.DocListViewModel(options.documents || [], options);
-        ko.applyBindings(docListViewModel, document.getElementById(rootElementId));
-    },
-
     /*
      isVideo is used to limit the allowed hosts for embedding videos
      If isVideo is false the list of hosts will be limited to audio hosts.
@@ -897,7 +941,7 @@ ALA.DocView = {
                 var attr = $(element).attr('src');
                 if (typeof attr !== typeof undefined && attr !== false) {
                     var height = element.getAttribute("height") ? element.getAttribute("height") : "315";
-                    iframe = ALA.DocView.isUrlAndHostValid(attr, allowedHosts) ? '<iframe width="100%" src ="' + attr + '" height = "' + height + '"/></iframe>' : "";
+                    iframe = ALA.DocView.isUrlAndHostValid(attr, allowedHosts) ? '<iframe  class="embed-responsive-item" width="100%" src ="' + attr + '" height = "' + height + '"/></iframe>' : "";
                 }
                 return iframe;
             }
@@ -918,5 +962,10 @@ ALA.DocView = {
         var l = document.createElement("a");
         l.href = href;
         return l.hostname;
+    },
+
+    initDocView: function (rootElementId, options) {
+        var docListViewModel = new ALA.DocListViewModel(options.documents || [], options);
+        ko.applyBindings(docListViewModel, document.getElementById(rootElementId));
     }
 }

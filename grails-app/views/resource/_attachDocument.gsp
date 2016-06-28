@@ -14,7 +14,7 @@
                         <label class="control-label" for="documentName">Title</label>
 
                         <div class="controls">
-                            <input id="documentName" type="text" data-bind="value:name"/>
+                            <input id="documentName" type="text" class="full-width validate[required]" data-bind="value:name"/>
                         </div>
                     </div>
 
@@ -22,7 +22,7 @@
                         <label class="control-label" for="documentAttribution">Attribution</label>
 
                         <div class="controls">
-                            <input id="documentAttribution" type="text" data-bind="value:attribution"/>
+                            <input id="documentAttribution" type="text" class="full-width validate[required]" data-bind="value:attribution"/>
                         </div>
                     </div>
 
@@ -30,7 +30,7 @@
                         <label class="control-label" for="documentRole">Document type</label>
 
                         <div class="controls">
-                            <select id="documentRole" style="width: 97%;" data-bind="options:roles, optionsText: 'name', optionsValue: 'id', value:role"></select>
+                            <select id="documentRole" class="full-width" data-bind="options:roles, optionsText: 'name', optionsValue: 'id', value:role"></select>
                         </div>
                     </div>
 
@@ -38,7 +38,7 @@
                         <label class="control-label" for="documentLicence">Licence</label>
 
                         <div class="controls">
-                            <input id="documentLicence" type="text" data-bind="value:licence"/>
+                            <input id="documentLicence" type="text" class="full-width validate[required]" data-bind="value:licence"/>
                         </div>
                     </div>
 
@@ -47,8 +47,8 @@
                             Embed video
                         </label>
                         <div class="controls">
-                            <textarea id="embeddedVideo" placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed services: Youtube, Vimeo, Ted, Wistia.)"
-                                      data-bind="value: embeddedVideo,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
+                            <textarea id="embeddedVideo" class="full-width validate[required]" placeholder="Example: <iframe width='560' height='315' src='https://www.youtube.com/embed/j1bR-0XBfcs' frameborder='0' allowfullscreen></iframe> (Allowed services: Youtube, Vimeo, Ted, Wistia.)"
+                                      data-bind="value: embeddedVideo,  valueUpdate: 'keyup'"  rows="3" type="text">
                             </textarea>
                         </div>
                     </div>
@@ -58,8 +58,8 @@
                             Embed audio
                         </label>
                         <div class="controls">
-                            <textarea id="embeddedAudio" placeholder="Example: <iframe width='560' height='315' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/260017391' frameborder='0' allowfullscreen></iframe> (Allowed services: SoundCloud.)"
-                                      data-bind="value: embeddedAudio,  valueUpdate: 'keyup'" style="width: 97%;" rows="3" type="text">
+                            <textarea id="embeddedAudio" class="full-width validate[required]" placeholder="Example: <iframe width='560' height='315' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/260017391' frameborder='0' allowfullscreen></iframe> (Allowed services: SoundCloud.)"
+                                      data-bind="value: embeddedAudio,  valueUpdate: 'keyup'"  rows="3" type="text">
                             </textarea>
                         </div>
                     </div>

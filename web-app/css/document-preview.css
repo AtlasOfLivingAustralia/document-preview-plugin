@@ -4,3 +4,7 @@
     display: -ms-flexbox;
     display: flex;
 }
+
+.full-width {
+    style="width: 97%;
+}

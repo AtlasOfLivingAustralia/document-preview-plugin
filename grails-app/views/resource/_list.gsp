@@ -6,6 +6,7 @@
 <body>
     <h3>List</h3>
     <g:render template="/resource/attachDocument"/>
+    <g:render template="/resource/removePopup"/>
     <g:render template="/resource/listDocuments"/>
 </body>
 
