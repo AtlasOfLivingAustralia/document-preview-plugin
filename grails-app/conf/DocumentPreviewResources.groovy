@@ -2,8 +2,8 @@ modules = {
 
     resourceLeaflet {
         dependsOn 'jquery'
-        resource url: 'vendor/leaflet/0.7.3/leaflet.css'
-        resource url: 'vendor/leaflet/0.7.3/leaflet.js'
+        resource url: [dir:'vendor/leaflet/0.7.3', file: 'leaflet.css', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/leaflet/0.7.3', file: 'leaflet.js', plugin:'document-preview-plugin' ]
     }
 
     resourceJqueryFileUpload {
@@ -11,17 +11,17 @@ modules = {
         dependsOn 'bootstrap3'
         dependsOn 'resourceJqueryUI'
 
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-ui.css', disposition: 'head'
-        resource url: 'vendor/fileupload-9.0.0/jquery.iframe-transport.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload.js'
-        resource url: 'vendor/fileupload-9.0.0/load-image.min.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-process.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-image.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-video.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-validate.js'
-        resource url: 'vendor/fileupload-9.0.0/jquery.fileupload-audio.js'
-        resource url: 'vendor/fileupload-9.0.0/locale.js'
-        resource url: 'vendor/fileupload-9.0.0/cors/jquery.xdr-transport.js',
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-ui.css', plugin:'document-preview-plugin' ], disposition: 'head'
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.iframe-transport.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'load-image.min.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-process.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-image.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-video.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-validate.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'jquery.fileupload-audio.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0', file: 'locale.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/fileupload-9.0.0/cors', file: 'jquery.xdr-transport.js', plugin:'document-preview-plugin' ],
                 wrapper: { s -> "<!--[if gte IE 8]>$s<![endif]-->" }
     }
 
@@ -29,25 +29,25 @@ modules = {
         dependsOn 'jquery'
         dependsOn 'bootstrap3'
         dependsOn 'resourceJqueryFileUpload'
-        dependsOn 'jqueryValidationEngine'
+        dependsOn 'resourcejqueryValidationEngine'
         dependsOn 'resourceKnockout'
-        resource url: 'css/document-preview.css', disposition: 'head'
-        resource url: 'js/preview/document.js'
+        resource url: [dir:'css', file: 'document-preview.css', plugin:'document-preview-plugin' ], disposition: 'head'
+        resource url: [dir:'js/preview', file: 'document.js', plugin:'document-preview-plugin' ]
     }
 
     resourceKnockout {
-        resource url: 'vendor/knockoutjs/3.4.0/knockout-3.4.0.debug.js'
-        resource url: 'vendor/knockoutjs/knockout.mapping-latest.js'
-        resource url: 'js/preview/knockout-extenders.js'
+        resource url: [dir:'vendor/knockoutjs/3.4.0', file: 'knockout-3.4.0.debug.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/knockoutjs', file: 'knockout.mapping-latest.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'js/preview', file: 'knockout-extenders.js', plugin:'document-preview-plugin' ]
     }
 
     resourceJqueryUI {
-        resource url: 'vendor/jquery-ui/jquery-ui-1.11.2-no-autocomplete.js', disposition: 'head'
-        resource url: '/vendor/jquery-ui/themes/smoothness/jquery-ui.css', attrs: [media: 'all'], disposition: 'head'
+        resource url: [dir:'vendor/jquery-ui/themes/smoothness', file: 'jquery-ui.css', plugin:'document-preview-plugin' ], attrs: [media: 'all'], disposition: 'head'
+        resource url: [dir:'vendor/jquery-ui', file: 'jquery-ui-1.11.2-no-autocomplete.js', plugin:'document-preview-plugin' ]
     }
-    jqueryValidationEngine {
-        resource url: 'vendor/jquery.validationEngine/jquery.validationEngine.js'
-        resource url: 'vendor/jquery.validationEngine/jquery.validationEngine-en.js'
-        resource url: 'vendor/jquery.validationEngine/validationEngine.jquery.css'
+    resourcejqueryValidationEngine {
+        resource url: [dir:'vendor/jquery.validationEngine', file: 'jquery.validationEngine.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/jquery.validationEngine', file: 'jquery.validationEngine-en.js', plugin:'document-preview-plugin' ]
+        resource url: [dir:'vendor/jquery.validationEngine', file: 'validationEngine.jquery.css', plugin:'document-preview-plugin' ]
     }
 }
